@@ -164,6 +164,11 @@ export class OccupancySensorAccessory {
 		const { device, service } = this
 
 		service.setCharacteristic(
+			this.platform.Characteristic.Manufacturer,
+			`Shaun Grady (.com)`
+		)
+
+		service.setCharacteristic(
 			this.platform.Characteristic.Name,
 			`${device.displayName} Occupancy`
 		)

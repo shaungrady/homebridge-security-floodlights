@@ -72,6 +72,11 @@ export class SwitchAccessory {
 		const { device, service, On } = this
 
 		service.setCharacteristic(
+			this.platform.Characteristic.Manufacturer,
+			`Shaun Grady (.com)`
+		)
+
+		service.setCharacteristic(
 			this.platform.Characteristic.Name,
 			device.displayName
 		)

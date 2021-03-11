@@ -97,6 +97,11 @@ export class SecuritySystemAccessory {
 			DISARMED,
 		} = this
 
+		service.setCharacteristic(
+			this.platform.Characteristic.Manufacturer,
+			`Shaun Grady (.com)`
+		)
+
 		service.setCharacteristic(platform.Characteristic.Name, device.displayName)
 
 		service
