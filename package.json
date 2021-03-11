@@ -12,7 +12,8 @@
   ],
   "main": "/plugin/index.js",
   "files": [
-    "plugin/**/*"
+    "plugin/**/*",
+    "config.schema.json"
   ],
   "engines": {
     "node": ">=10.17.0",
