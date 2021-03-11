@@ -7,7 +7,6 @@ import {
 	PlatformConfig,
 	Service,
 } from 'homebridge'
-import { filter } from 'rxjs/operators'
 
 import { OccupancySensorAccessory } from './accessories/occupancy-sensor.accessory'
 import { SecuritySystemAccessory } from './accessories/security-system.accessory'
@@ -42,7 +41,8 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		log.debug('Finished initializing platform')
 		api.on('didFinishLaunching', () => {
 			log.debug('Executed didFinishLaunching callback')
-			this.unregisterAllAccessories()
+			// For development:
+			// this.unregisterAllAccessories()
 			this.discoverDevices()
 			this.bindAccessoryEvents()
 		})
@@ -78,8 +78,8 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			} = groupConfig
 
 			const occupancySensor = this.getAccessory(OccupancySensorAccessory, {
-				displayName: `${displayName} Occupancy`,
 				id: `${id}:occupancy`,
+				displayName,
 				motionSensorCount,
 				occupancyTimeoutSeconds,
 			})
@@ -122,7 +122,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 
 		system.arm$.subscribe(() => {
 			for (const { overrideSwitch, occupancySensor } of lightGroups) {
-				if (overrideSwitch.isOff) {
+				if (overrideSwitch.isOff && windOverrideSwitch.isOff) {
 					occupancySensor.isActive = true
 				}
 			}
@@ -142,51 +142,20 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		})
 
 		windOverrideSwitch.off$.subscribe(() => {
-			for (const { overrideSwitch, occupancySensor } of lightGroups) {
-				if (system.isArmed && overrideSwitch.isOff) {
+			for (const { occupancySensor } of lightGroups) {
+				if (system.isArmed) {
 					occupancySensor.isActive = true
 				}
 			}
 		})
 
-		/**
-		 * LIGHT GROUP HOMEKIT AUTOMATIONS
-		 *
-		 * [Turning lights on]
-		 *  IF ANY
-		 *    Occupancy.Detected = true
-		 *    Occupancy.Active = true
-		 *  AND ALL
-		 *    Occupancy.Tamper = false
-		 *    System.State != DISARM
-		 *  THEN
-		 *    Scene: on
-		 *
-		 * [Turning lights to dim/off]
-		 *  IF ANY
-		 *    Occupancy.Detected = false
-		 *    Occupancy.Active = false
-		 *  AND
-		 *    Occupancy.Tamper = false
-		 *  THEN
-		 *    Shortcut:
-		 *      - get System.CurrentState
-		 *      - if (state == STAY)
-		 *        - Scene: dim
-		 *      - else
-		 *        - Scene: off
-		 */
 		for (const { overrideSwitch, occupancySensor } of lightGroups) {
 			overrideSwitch.on$.subscribe(() => {
 				occupancySensor.isTampered = true
-				occupancySensor.isActive = false
 			})
 
 			overrideSwitch.off$.subscribe(() => {
 				occupancySensor.isTampered = false
-				if (system.isArmed && windOverrideSwitch.isOff) {
-					occupancySensor.isActive = true
-				}
 			})
 		}
 	}
@@ -209,6 +178,5 @@ interface AccessoryConstructor<T> {
 interface AccessoryConfig {
 	id: string
 	displayName: string
-
 	[option: string]: any
 }
