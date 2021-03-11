@@ -254,21 +254,23 @@ export class OccupancySensorAccessory {
 				.getCharacteristic(this.On)
 				.onGet(() => switchState)
 				.onSet((state) => {
-					switchState = state
-					state
-						? this.incrementActiveMotionSwitches()
-						: this.decrementActiveMotionSwitches()
+					if (state !== switchState) {
+						switchState = state
+						state
+							? this.incrementActiveMotionSwitches(motionSensorCount)
+							: this.decrementActiveMotionSwitches()
+					}
 				})
 		}
 	}
 
-	private incrementActiveMotionSwitches() {
+	private incrementActiveMotionSwitches(max: number) {
 		const count = this.#activeMotionSwitchCount.getValue() + 1
-		this.#activeMotionSwitchCount.next(count)
+		this.#activeMotionSwitchCount.next(Math.min(count, max))
 	}
 
 	private decrementActiveMotionSwitches() {
 		const count = this.#activeMotionSwitchCount.getValue() - 1
-		this.#activeMotionSwitchCount.next(count)
+		this.#activeMotionSwitchCount.next(Math.max(count, 0))
 	}
 }
