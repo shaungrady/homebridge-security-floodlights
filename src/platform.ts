@@ -11,7 +11,7 @@ import {
 import { OccupancySensorAccessory } from './accessories/occupancy-sensor.accessory'
 import { SecuritySystemAccessory } from './accessories/security-system.accessory'
 import { SwitchAccessory } from './accessories/switch.accessory'
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings'
+import { PLATFORM_NAME, PLUGIN_NAME, VERSION } from './constants'
 
 /**
  * HomebridgePlatform
@@ -54,6 +54,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 	 */
 	configureAccessory(accessory: PlatformAccessory) {
 		this.log.debug('Loading accessory from cache:', accessory.displayName)
+
 		// add the restored accessory to the accessories cache so we can track if it has already been registered
 		this.accessories.push(accessory)
 	}
@@ -104,17 +105,25 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 
 		if (cachedAccessory) {
 			log.debug('Found accessory in cache:', cachedAccessory.displayName)
-			return new ctor(this, cachedAccessory)
-		} else {
-			log.debug('Registering new accessory:', config.displayName)
-			const accessory = new api.platformAccessory(config.displayName, uuid)
-			accessory.context.device = config
-
-			const accessoryHandler = new ctor(this, accessory)
-			api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
-
-			return accessoryHandler
+			if (cachedAccessory.context.version === VERSION) {
+				return new ctor(this, cachedAccessory)
+			} else {
+				log.debug('Found accessory is outdated; unregistering.')
+				this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+					cachedAccessory,
+				])
+			}
 		}
+
+		log.debug('Registering new accessory:', config.displayName)
+		const accessory = new api.platformAccessory(config.displayName, uuid)
+		accessory.context.device = config
+		accessory.context.version = VERSION
+
+		const accessoryHandler = new ctor(this, accessory)
+		api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
+
+		return accessoryHandler
 	}
 
 	bindAccessoryEvents(): void {
@@ -178,5 +187,6 @@ interface AccessoryConstructor<T> {
 interface AccessoryConfig {
 	id: string
 	displayName: string
+
 	[option: string]: any
 }

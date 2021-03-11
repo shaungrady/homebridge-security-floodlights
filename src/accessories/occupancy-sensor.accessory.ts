@@ -1,9 +1,5 @@
-import {
-	Characteristic,
-	CharacteristicValue,
-	PlatformAccessory,
-} from 'homebridge'
-import { BehaviorSubject, ConnectableObservable, noop, of } from 'rxjs'
+import { CharacteristicValue, PlatformAccessory } from 'homebridge'
+import { BehaviorSubject, ConnectableObservable, of } from 'rxjs'
 import {
 	delay,
 	distinctUntilChanged,
