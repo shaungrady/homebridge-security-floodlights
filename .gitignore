@@ -1,0 +1,9 @@
+/node_modules
+/plugin
+/test/homebridge-dev/.*-secrets
+/test/homebridge-dev/accessories
+/test/homebridge-dev/persist
+*.tsbuildinfo
+
+.idea
+.DS_Store

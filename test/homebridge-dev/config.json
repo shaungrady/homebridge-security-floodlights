@@ -1,0 +1,16 @@
+{
+  "accessories": [],
+  "platforms": [
+    {
+      "platform": "SecurityFloodlights",
+      "lightGroups": [
+        {
+          "id": "backyard",
+          "displayName": "Backyard",
+          "motionSensorCount": 2,
+          "occupancyTimeoutSeconds": 6
+        }
+      ]
+    }
+  ]
+}
