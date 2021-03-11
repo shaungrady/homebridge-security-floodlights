@@ -165,7 +165,7 @@ export class OccupancySensorAccessory {
 
 		service.setCharacteristic(
 			this.platform.Characteristic.Name,
-			device.displayName
+			`${device.displayName} Occupancy`
 		)
 
 		this.bindStateHandlers()
@@ -234,6 +234,7 @@ export class OccupancySensorAccessory {
 	private addMotionSensorSwitches(): void {
 		const { id, displayName, motionSensorCount } = this.device
 		const baseName = `${displayName} Floodlight Motion`
+		const statesBySwitch = new Map<unknown, CharacteristicValue>()
 
 		for (let i = 0; i < motionSensorCount; i++) {
 			const switchName = `${baseName} ${i + 1}`
@@ -247,30 +248,23 @@ export class OccupancySensorAccessory {
 					switchId
 				)
 
-			// No need to expose state externally.
-			let switchState: CharacteristicValue = false
-
 			motionSwitch
 				.getCharacteristic(this.On)
-				.onGet(() => switchState)
+				.onGet(() => statesBySwitch.get(motionSwitch) || false)
 				.onSet((state) => {
-					if (state !== switchState) {
-						switchState = state
-						state
-							? this.incrementActiveMotionSwitches(motionSensorCount)
-							: this.decrementActiveMotionSwitches()
-					}
+					statesBySwitch.set(motionSwitch, state)
+					this.updateActiveSwitchCount(statesBySwitch)
 				})
 		}
 	}
 
-	private incrementActiveMotionSwitches(max: number) {
-		const count = this.#activeMotionSwitchCount.getValue() + 1
-		this.#activeMotionSwitchCount.next(Math.min(count, max))
-	}
+	private updateActiveSwitchCount(
+		stateMap: Map<unknown, CharacteristicValue>
+	): void {
+		const activeCount = [...stateMap.values()]
+			.map(Number)
+			.reduce((a, b) => a + b, 0)
 
-	private decrementActiveMotionSwitches() {
-		const count = this.#activeMotionSwitchCount.getValue() - 1
-		this.#activeMotionSwitchCount.next(Math.max(count, 0))
+		this.#activeMotionSwitchCount.next(activeCount)
 	}
 }
