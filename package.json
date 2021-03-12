@@ -23,7 +23,7 @@
     "start": "tsc && nodemon",
     "build": "rimraf ./plugin && tsc",
     "postbuild": "replace-in-file 'v0.0.0' \"v$npm_package_version\" ./plugin/constants.*",
-    "postversion": "yarn build"
+    "prepack": "yarn build"
   },
   "dependencies": {
     "rxjs": "^6.6.6"

@@ -1,61 +1,60 @@
 {
-  "pluginAlias": "SecurityFloodlights",
-  "pluginType": "platform",
-  "singular": true,
+	"pluginAlias": "SecurityFloodlights",
+	"pluginType": "platform",
+	"singular": true,
 
-  "schema": {
-    "type": "object",
-    "properties": {
-      "showWindOverrideSwitch": {
-        "title": "Show Wind Override Switch",
-        "description": "If your motion sensors are susceptible to being erroneously triggered by high winds, you can create a Shortcut Automation to toggle this switch based on the hourly wind forecast in your area.",
-        "type": "boolean"
-      },
+	"schema": {
+		"type": "object",
+		"properties": {
+			"showWindOverrideSwitch": {
+				"title": "Show Wind Override Switch",
+				"description": "If your motion sensors are susceptible to being erroneously triggered by high winds, you can create a Shortcut Automation to toggle this switch based on the hourly wind forecast in your area.",
+				"type": "boolean"
+			},
 
-      "lightGroups": {
-        "type": "array",
-        "items": {
-          "title": "Floodlight Group",
-          "type": "object",
-          "properties": {
+			"lightGroups": {
+				"type": "array",
+				"items": {
+					"title": "Floodlight Group",
+					"type": "object",
+					"properties": {
+						"displayName": {
+							"title": "Group Name",
+							"description": "In most cases, this should match the name of the room the floodlight group is in.",
+							"required": true,
+							"type": "string",
+							"placeholder": "Backyard"
+						},
 
-            "displayName": {
-              "title": "Group Name",
-              "description": "In most cases, this should match the name of the room the floodlight group is in.",
-              "required": true,
-              "type": "string",
-              "placeholder": "Backyard"
-            },
+						"id": {
+							"title": "Group ID",
+							"description": "A unique identifier. Changing this will cause automations tied to this group to be lost. This can be the same as the Group Name.",
+							"required": true,
+							"type": "string"
+						},
 
-            "id": {
-              "title": "Group ID",
-              "description": "A unique identifier. Changing this will cause automations tied to this group to be lost. This can be the same as the Group Name.",
-              "required": true,
-              "type": "string"
-            },
+						"motionSensorCount": {
+							"title": "Motion Sensor Switch Count",
+							"description": "The number of physical motion sensors in this floodlight group. Each floodlight group has an Occupancy Sensor with switches grouped inside of it. You will create HomeKit automations linking your physical motion sensors to the switches inside of this floodlight group's Occupancy Sensor.",
+							"required": true,
+							"type": "integer",
+							"minimum": 1,
+							"default": 1,
+							"placeholder": "Number of motion sensors"
+						},
 
-            "motionSensorCount": {
-              "title": "Motion Sensor Switch Count",
-              "description": "The number of physical motion sensors in this floodlight group. Each floodlight group has an Occupancy Sensor with switches grouped inside of it. You will create HomeKit automations linking your physical motion sensors to the switches inside of this floodlight group's Occupancy Sensor.",
-              "required": true,
-              "type": "integer",
-              "minimum": 1,
-              "default": 1,
-              "placeholder": "Number of motion sensors"
-            },
-
-            "occupancyTimeoutSeconds": {
-              "title": "Occupancy Inactivity Delay",
-              "description": "After all of the grouped switches inside of the Occupancy Sensor turn off, it will wait this many seconds before changing to 'no occupancy.' Defaults to two minutes.",
-              "required": true,
-              "type": "integer",
-              "minimum": 0,
-              "default": 120,
-              "placeholder": "Seconds before occupancy sensor shows 'no occupancy.'"
-            }
-          }
-        }
-      }
-    }
-  }
+						"occupancyTimeoutSeconds": {
+							"title": "Occupancy Inactivity Delay",
+							"description": "After all of the grouped switches inside of the Occupancy Sensor turn off, it will wait this many seconds before changing to 'no occupancy.' Defaults to two minutes.",
+							"required": true,
+							"type": "integer",
+							"minimum": 0,
+							"default": 120,
+							"placeholder": "Seconds before occupancy sensor shows 'no occupancy.'"
+						}
+					}
+				}
+			}
+		}
+	}
 }

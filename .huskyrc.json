@@ -1,5 +1,5 @@
 {
-  "hooks": {
-    "pre-commit": "lint-staged --concurrent true"
-  }
+	"hooks": {
+		"pre-commit": "lint-staged --concurrent true"
+	}
 }
