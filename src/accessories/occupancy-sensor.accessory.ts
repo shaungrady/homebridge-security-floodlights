@@ -161,7 +161,7 @@ export class OccupancySensorAccessory {
 
 		service.setCharacteristic(
 			this.platform.Characteristic.Name,
-			`${device.displayName} Occupancy`
+			device.displayName
 		)
 
 		this.bindStateHandlers()
@@ -230,7 +230,7 @@ export class OccupancySensorAccessory {
 
 	private addMotionSensorSwitches(): void {
 		const { id, displayName, motionSensorCount } = this.device
-		const baseName = `${displayName} Floodlight Motion`
+		const baseName = `${displayName} Motion`
 		const statesBySwitch = new Map<unknown, CharacteristicValue>()
 
 		for (let i = 0; i < motionSensorCount; i++) {

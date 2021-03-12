@@ -80,8 +80,8 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			} = groupConfig
 
 			const occupancySensor = this.getAccessory(OccupancySensorAccessory, {
+				displayName: `${displayName} Occupancy`,
 				id: `${id}:occupancy`,
-				displayName,
 				motionSensorCount,
 				occupancyTimeoutSeconds,
 			})
