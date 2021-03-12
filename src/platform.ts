@@ -23,7 +23,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 	readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic
 
 	// this is used to track restored cached accessories
-	readonly accessories: PlatformAccessory[] = []
+	readonly accessories = new Set<PlatformAccessory>()
 
 	private system!: SecuritySystemAccessory
 	private windOverrideSwitch!: SwitchAccessory
@@ -45,6 +45,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			// this.unregisterAllAccessories()
 			this.discoverDevices()
 			this.bindAccessoryEvents()
+			this.unregisterUnconfiguredDevices()
 		})
 	}
 
@@ -56,7 +57,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		this.log.debug('Loading accessory from cache:', accessory.displayName)
 
 		// add the restored accessory to the accessories cache so we can track if it has already been registered
-		this.accessories.push(accessory)
+		this.accessories.add(accessory)
 	}
 
 	discoverDevices() {
@@ -98,13 +99,16 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		ctor: AccessoryConstructor<T>,
 		config: AccessoryConfig
 	): T {
-		const { log, api, accessories } = this
+		const { log, api } = this
+		const accessories = [...this.accessories]
 
 		const uuid = api.hap.uuid.generate(`${PLATFORM_NAME}:${config.id}`)
 		const cachedAccessory = accessories.find(({ UUID }) => UUID === uuid)
 
 		if (cachedAccessory) {
 			log.debug('Found accessory in cache:', cachedAccessory.displayName)
+			this.accessories.delete(cachedAccessory)
+
 			if (cachedAccessory.context.version === VERSION && VERSION !== 'v0.0.0') {
 				return new ctor(this, cachedAccessory)
 			} else {
@@ -169,14 +173,20 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		}
 	}
 
-	private unregisterAllAccessories() {
-		this.log.debug('Unregistering all accessories.')
+	private unregisterUnconfiguredDevices() {
+		const accessories = [...this.accessories]
+		const count = accessories.length
+
+		if (!count) {
+			return
+		}
+
+		this.log.debug(`Unregistering ${count} unconfigured accessories.`)
 		this.api.unregisterPlatformAccessories(
 			PLUGIN_NAME,
 			PLATFORM_NAME,
-			this.accessories
+			accessories
 		)
-		this.accessories.length = 0
 	}
 }
 
