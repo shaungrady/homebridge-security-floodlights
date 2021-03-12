@@ -207,6 +207,7 @@ export class OccupancySensorAccessory {
 
 		this.#activeMotionSwitchCount
 			.pipe(
+				distinctUntilChanged(),
 				tap((count) =>
 					log.debug(`${displayName} active motion switches: ${count}`)
 				),
