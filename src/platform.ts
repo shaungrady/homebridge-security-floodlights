@@ -38,7 +38,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		public readonly config: PlatformConfig,
 		public readonly api: API
 	) {
-		log.debug('Finished initializing platform')
+		log.debug(`Finished initializing platform (${VERSION})`)
 		api.on('didFinishLaunching', () => {
 			log.debug('Executed didFinishLaunching callback')
 			// For development:
@@ -105,7 +105,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 
 		if (cachedAccessory) {
 			log.debug('Found accessory in cache:', cachedAccessory.displayName)
-			if (cachedAccessory.context.version === VERSION) {
+			if (cachedAccessory.context.version === VERSION && VERSION !== 'v0.0.0') {
 				return new ctor(this, cachedAccessory)
 			} else {
 				log.debug('Found accessory is outdated; unregistering.')

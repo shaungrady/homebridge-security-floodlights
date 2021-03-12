@@ -1,4 +1,5 @@
-export const VERSION = process.env.npm_package_version
+// Gets replaced in postbuild script
+export const VERSION = 'v0.0.0'
 
 /**
  * This is the name of the platform that users will use to register the plugin in the Homebridge config.json

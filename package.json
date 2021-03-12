@@ -21,7 +21,9 @@
   },
   "scripts": {
     "start": "tsc && nodemon",
-    "build": "rimraf ./plugin && tsc"
+    "build": "rimraf ./plugin && tsc",
+    "postbuild": "replace-in-file 'v0.0.0' \"v$npm_package_version\" ./plugin/constants.*",
+    "postversion": "yarn build"
   },
   "dependencies": {
     "rxjs": "^6.6.6"
@@ -41,6 +43,7 @@
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
     "prettier-plugin-import-sort": "^0.0.6",
+    "replace-in-file": "^6.2.0",
     "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.3"
