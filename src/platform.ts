@@ -134,7 +134,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		const { system, windOverrideSwitch, lightGroups } = this
 
 		system.arm$.subscribe(() => {
-			for (const { overrideSwitch, occupancySensor } of lightGroups) {
+			for (const { occupancySensor, overrideSwitch } of lightGroups) {
 				if (overrideSwitch.isOff && windOverrideSwitch.isOff) {
 					occupancySensor.isActive = true
 				}
@@ -142,7 +142,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		})
 
 		system.disarm$.subscribe(() => {
-			for (const { overrideSwitch, occupancySensor } of lightGroups) {
+			for (const { occupancySensor, overrideSwitch } of lightGroups) {
 				overrideSwitch.isOn = false
 				occupancySensor.isActive = false
 			}
@@ -151,6 +151,14 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		windOverrideSwitch.on$.subscribe(() => {
 			for (const { occupancySensor } of lightGroups) {
 				occupancySensor.isActive = false
+
+				// Temporarily set occupied to false so HK automations can trigger, allowing
+				// the lights to return to their normal "not occupied" state.
+				occupancySensor.isOccupied = false
+				setTimeout(() => {
+					occupancySensor.isOccupied =
+						occupancySensor.activeMotionSwitchCount > 0
+				}, 2_500)
 			}
 		})
 
@@ -162,7 +170,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			}
 		})
 
-		for (const { overrideSwitch, occupancySensor } of lightGroups) {
+		for (const { occupancySensor, overrideSwitch } of lightGroups) {
 			overrideSwitch.on$.subscribe(() => {
 				occupancySensor.isTampered = true
 			})

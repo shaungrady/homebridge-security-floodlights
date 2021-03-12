@@ -103,6 +103,10 @@ export class OccupancySensorAccessory {
 		this.#occupancyDetected$.next(state)
 	}
 
+	get activeMotionSwitchCount(): number {
+		return this.#activeMotionSwitchCount.getValue()
+	}
+
 	//////////////////////////////////////////////////////////////////////////////
 	// StatusTampered Public Members /////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////
@@ -218,10 +222,10 @@ export class OccupancySensorAccessory {
 				startWith(false),
 				distinctUntilChanged(),
 				tap((isActive) => {
-					if (isActive) {
-						log.debug(`${displayName} motion switches active`)
-					} else {
-						log.debug(`${displayName} motion switch inactivity timeout reached`)
+					if (!isActive) {
+						log.debug(
+							`${displayName} motion switch ${occupancyTimeoutSeconds}s timeout reached`
+						)
 					}
 				})
 			)
