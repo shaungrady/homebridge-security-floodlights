@@ -30,7 +30,9 @@ export class SecuritySystemAccessory {
 	private readonly NIGHT_ARM = this.CurrentState.NIGHT_ARM
 
 	/** Drives state updates and sharing with the platform. */
-	#currentState$ = new BehaviorSubject<State>(this.DISARMED)
+	#currentState$ = new BehaviorSubject<State>(
+		this.accessory.context.state ?? this.DISARMED
+	)
 
 	private get currentState(): State {
 		return this.#currentState$.getValue()
@@ -43,6 +45,11 @@ export class SecuritySystemAccessory {
 	readonly currentState$: ConnectableObservable<State> = this.#currentState$.pipe(
 		distinctUntilChanged(),
 		tap((state) => {
+			// Save to HomeBridge
+			this.accessory.context.state = state
+			this.platform.api.updatePlatformAccessories([this.accessory])
+
+			// Publish to HomeKit
 			this.service.updateCharacteristic(this.CurrentState, state)
 			const stateName = this.#stateNames.get(state) || state
 			this.platform.log.info(

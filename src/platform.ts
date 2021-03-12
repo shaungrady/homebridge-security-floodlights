@@ -109,7 +109,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			log.debug('Found accessory in cache:', cachedAccessory.displayName)
 			this.accessories.delete(cachedAccessory)
 
-			if (cachedAccessory.context.version === VERSION && VERSION !== 'v0.0.0') {
+			if (cachedAccessory.context.version === VERSION) {
 				return new ctor(this, cachedAccessory)
 			} else {
 				log.debug('Found accessory is outdated; unregistering.')

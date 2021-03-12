@@ -21,7 +21,7 @@ export class SwitchAccessory {
 
 	private readonly On = this.platform.Characteristic.On
 
-	#on$ = new BehaviorSubject<OnState>(false)
+	#on$ = new BehaviorSubject<OnState>(this.accessory.context.state ?? false)
 
 	private get on(): OnState {
 		return this.#on$.getValue()
@@ -34,6 +34,11 @@ export class SwitchAccessory {
 	readonly isOn$: ConnectableObservable<boolean> = this.#on$.pipe(
 		distinctUntilChanged(),
 		tap((state) => {
+			// Save to HomeBridge
+			this.accessory.context.state = state
+			this.platform.api.updatePlatformAccessories([this.accessory])
+
+			// Publish to HomeKit
 			this.service.updateCharacteristic(this.On, state)
 			this.platform.log.info(
 				`${this.device.displayName}: ${state ? 'on' : 'off'}`
