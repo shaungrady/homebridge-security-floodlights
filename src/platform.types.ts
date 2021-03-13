@@ -1,8 +1,9 @@
 import { PlatformConfig } from 'homebridge'
+import { PlatformIdentifier, PlatformName } from 'homebridge/lib/api'
 
 export interface FloodlightPlatformConfig extends PlatformConfig {
-	showWindOverrideSwitch: boolean
-	lightGroups: LightGroup[]
+	showWindOverrideSwitch?: boolean
+	lightGroups?: LightGroup[]
 }
 
 export interface LightGroup {

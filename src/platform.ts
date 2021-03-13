@@ -76,7 +76,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			displayName: 'Floodlight Wind Override',
 		})
 
-		for (const groupConfig of this.config.lightGroups) {
+		for (const groupConfig of this.config?.lightGroups ?? []) {
 			const {
 				id,
 				displayName,
@@ -218,7 +218,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 				displayName,
 				motionSensorCount,
 				occupancyTimeoutSeconds,
-			} of this.config.lightGroups) {
+			} of this.config?.lightGroups ?? []) {
 				if (typeof id !== 'string') {
 					errors.add(`Bad light group property 'id' value: ${id}`)
 				}
