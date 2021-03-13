@@ -4,7 +4,6 @@ import {
 	DynamicPlatformPlugin,
 	Logger,
 	PlatformAccessory,
-	PlatformConfig,
 	Service,
 } from 'homebridge'
 
@@ -12,6 +11,7 @@ import { OccupancySensorAccessory } from './accessories/occupancy-sensor.accesso
 import { SecuritySystemAccessory } from './accessories/security-system.accessory'
 import { SwitchAccessory } from './accessories/switch.accessory'
 import { PLATFORM_NAME, PLUGIN_NAME, VERSION } from './constants'
+import { FloodlightPlatformConfig } from './platform.types'
 
 /**
  * HomebridgePlatform
@@ -35,10 +35,15 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 
 	constructor(
 		public readonly log: Logger,
-		public readonly config: PlatformConfig,
+		public readonly config: FloodlightPlatformConfig,
 		public readonly api: API
 	) {
 		log.debug(`Finished initializing platform (${VERSION})`)
+
+		if (this.isConfigInvalid(config)) {
+			return
+		}
+
 		api.on('didFinishLaunching', () => {
 			log.debug('Executed didFinishLaunching callback')
 			// For development:
@@ -195,6 +200,53 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			PLATFORM_NAME,
 			accessories
 		)
+	}
+
+	private isConfigInvalid(config: FloodlightPlatformConfig): boolean {
+		const errors = new Set<string>()
+
+		if (!('showWindOverrideSwitch' in config)) {
+			errors.add(`Missing config property 'showWindOverrideSwitch'`)
+		}
+
+		if (!('lightGroups' in config)) {
+			errors.add(`Missing config property 'lightGroups'`)
+		} else {
+			for (const {
+				id,
+				displayName,
+				motionSensorCount,
+				occupancyTimeoutSeconds,
+			} of this.config.lightGroups) {
+				if (typeof id !== 'string') {
+					errors.add(`Bad light group property 'id' value: ${id}`)
+				}
+
+				if (typeof displayName !== 'string') {
+					errors.add(
+						`Bad light group property 'displayName' value: ${displayName}`
+					)
+				}
+
+				if (typeof motionSensorCount !== 'number') {
+					errors.add(
+						`Bad light group property 'motionSensorCount' value: ${motionSensorCount}`
+					)
+				}
+
+				if (typeof occupancyTimeoutSeconds !== 'number') {
+					errors.add(
+						`Bad light group property 'occupancyTimeoutSeconds' value: ${occupancyTimeoutSeconds}`
+					)
+				}
+			}
+		}
+
+		for (const error in errors) {
+			this.log.error(error)
+		}
+
+		return errors.size > 0
 	}
 }
 
