@@ -128,6 +128,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		const accessory = new api.platformAccessory(config.displayName, uuid)
 		accessory.context.device = config
 		accessory.context.version = VERSION
+		accessory.context.state = cachedAccessory?.context.state
 
 		const accessoryHandler = new ctor(this, accessory)
 		api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
