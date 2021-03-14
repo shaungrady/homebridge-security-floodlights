@@ -1,7 +1,7 @@
 {
   "name": "@shaungrady/homebridge-security-floodlights",
   "displayName": "Security Floodlights",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "HomeKit security lighting",
   "homepage": "https://github.com/shaungrady/homebridge-security-floodlights",
   "repository": "github:shaungrady/homebridge-security-floodlights",
