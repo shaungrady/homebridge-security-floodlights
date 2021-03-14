@@ -3,8 +3,8 @@
 	"pluginType": "platform",
 	"singular": true,
 
-	"headerDisplay": "[Refer to the wiki](https://github.com/shaungrady/homebridge-security-floodlights/wiki/1.-Configuration) for help with configuring this plugin to your needs.",
-	"footerDisplay": "[Refer to the wiki](https://github.com/shaungrady/homebridge-security-floodlights/wiki/2.-Automations) to build your HomeKit automations correctly.",
+	"headerDisplay": "⚠️ [Refer to the wiki](https://github.com/shaungrady/homebridge-security-floodlights/wiki/1.-Configuration) to read about each of the following configuration options. When you're done with configuration, [read the wiki's Automations page](https://github.com/shaungrady/homebridge-security-floodlights/wiki/2.-Automations) to build your HomeKit automations correctly.",
+	"footerDisplay": "⚠️ [Refer to the wiki](https://github.com/shaungrady/homebridge-security-floodlights/wiki/2.-Automations) to build your HomeKit automations correctly.",
 
 	"schema": {
 		"type": "object",
@@ -24,7 +24,7 @@
 					"properties": {
 						"displayName": {
 							"title": "Group Name",
-							"description": "Example: `Garage`. [Help](https://github.com/shaungrady/homebridge-security-floodlights/wiki/1.-Configuration#group-name)",
+							"description": "Example: `Garage`.",
 							"required": true,
 							"type": "string",
 							"placeholder": "Backyard"
@@ -32,14 +32,14 @@
 
 						"id": {
 							"title": "Group ID",
-							"description": "A unique ID that won't change. [Help](https://github.com/shaungrady/homebridge-security-floodlights/wiki/1.-Configuration#group-id)",
+							"description": "A unique ID that won't change.",
 							"required": true,
 							"type": "string"
 						},
 
 						"motionSensorCount": {
 							"title": "Motion Sensor Switch Count",
-							"description": "Number of sensors participating in triggering this group's lights. [Help](https://github.com/shaungrady/homebridge-security-floodlights/wiki/1.-Configuration#group-id)",
+							"description": "Number of sensors participating in triggering this group's lights.",
 							"required": true,
 							"type": "integer",
 							"minimum": 1,
@@ -49,7 +49,7 @@
 
 						"occupancyTimeoutSeconds": {
 							"title": "Occupancy Inactivity Delay (seconds)",
-							"description": "How long before lights turn off after no motion. [Help](https://github.com/shaungrady/homebridge-security-floodlights/wiki/1.-Configuration#occupancy-inactivity-delay-seconds)",
+							"description": "How long before lights turn off after no motion.",
 							"required": true,
 							"type": "integer",
 							"minimum": 0,
