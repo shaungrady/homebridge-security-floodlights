@@ -8,12 +8,16 @@ import {
 	tap,
 } from 'rxjs/operators'
 
+import { MANUFACTURER } from '../constants'
 import { SecurityFloodlightsPlatform } from '../platform'
 
 type OnState = CharacteristicValue | boolean
 
 export class SwitchAccessory {
 	readonly device = this.accessory.context.device
+	readonly informationService = this.accessory.getService(
+		this.platform.Service.AccessoryInformation
+	)!
 
 	private readonly service =
 		this.accessory.getService(this.platform.Service.Switch) ||
@@ -78,6 +82,21 @@ export class SwitchAccessory {
 		service.setCharacteristic(
 			this.platform.Characteristic.Name,
 			device.displayName
+		)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.Manufacturer,
+			MANUFACTURER
+		)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.Model,
+			'Switch'
+		)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.SerialNumber,
+			this.accessory.context.serialNumber
 		)
 
 		this.service

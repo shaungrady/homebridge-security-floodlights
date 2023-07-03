@@ -8,16 +8,20 @@ import {
 	tap,
 } from 'rxjs/operators'
 
+import { MANUFACTURER } from '../constants'
 import { SecurityFloodlightsPlatform } from '../platform'
 
 type State = CharacteristicValue | number
 
 export class SecuritySystemAccessory {
+	readonly device = this.accessory.context.device
+	readonly informationService = this.accessory.getService(
+		this.platform.Service.AccessoryInformation
+	)!
+
 	private readonly service =
 		this.accessory.getService(this.platform.Service.SecuritySystem) ||
 		this.accessory.addService(this.platform.Service.SecuritySystem)
-
-	readonly device = this.accessory.context.device
 
 	private readonly TargetState = this.platform.Characteristic
 		.SecuritySystemTargetState
@@ -105,6 +109,21 @@ export class SecuritySystemAccessory {
 		} = this
 
 		service.setCharacteristic(platform.Characteristic.Name, device.displayName)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.Manufacturer,
+			MANUFACTURER
+		)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.Model,
+			'Security Floodlights'
+		)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.SerialNumber,
+			this.accessory.context.serialNumber
+		)
 
 		service
 			.getCharacteristic(TargetState)

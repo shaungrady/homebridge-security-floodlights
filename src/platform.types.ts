@@ -1,4 +1,4 @@
-import { PlatformConfig } from 'homebridge'
+import { PlatformConfig, AccessoryConfig } from 'homebridge'
 import { PlatformIdentifier, PlatformName } from 'homebridge/lib/api'
 
 export interface FloodlightPlatformConfig extends PlatformConfig {
@@ -16,3 +16,11 @@ export interface LightGroup {
 	/** Number of seconds it takes before occupancy sensors changes to inactive */
 	occupancyTimeoutSeconds: number
 }
+
+export type AccessoryContext = {
+	device: AccessoryConfig
+	version: string
+	serialNumber: string
+	state: any
+}
+

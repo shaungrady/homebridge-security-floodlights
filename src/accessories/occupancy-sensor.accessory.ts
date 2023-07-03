@@ -10,6 +10,7 @@ import {
 	tap,
 } from 'rxjs/operators'
 
+import { MANUFACTURER } from '../constants'
 import { SecurityFloodlightsPlatform } from '../platform'
 
 type OccupancyDetectedState = CharacteristicValue | number
@@ -18,6 +19,9 @@ type StatusActiveState = CharacteristicValue | boolean
 
 export class OccupancySensorAccessory {
 	readonly device = this.accessory.context.device
+	readonly informationService = this.accessory.getService(
+		this.platform.Service.AccessoryInformation
+	)!
 
 	private readonly service =
 		this.accessory.getService(this.platform.Service.OccupancySensor) ||
@@ -166,6 +170,21 @@ export class OccupancySensorAccessory {
 		service.setCharacteristic(
 			this.platform.Characteristic.Name,
 			device.displayName
+		)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.Manufacturer,
+			MANUFACTURER
+		)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.Model,
+			'Occupancy Sensor'
+		)
+
+		this.informationService.setCharacteristic(
+			this.platform.Characteristic.SerialNumber,
+			this.accessory.context.serialNumber
 		)
 
 		this.bindStateHandlers()

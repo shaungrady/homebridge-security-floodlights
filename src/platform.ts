@@ -6,12 +6,13 @@ import {
 	PlatformAccessory,
 	Service,
 } from 'homebridge'
+import { nanoid } from 'nanoid'
 
 import { OccupancySensorAccessory } from './accessories/occupancy-sensor.accessory'
 import { SecuritySystemAccessory } from './accessories/security-system.accessory'
 import { SwitchAccessory } from './accessories/switch.accessory'
 import { PLATFORM_NAME, PLUGIN_NAME, VERSION } from './constants'
-import { FloodlightPlatformConfig } from './platform.types'
+import { AccessoryContext, FloodlightPlatformConfig } from './platform.types'
 
 /**
  * HomebridgePlatform
@@ -21,9 +22,12 @@ import { FloodlightPlatformConfig } from './platform.types'
 export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 	readonly Service: typeof Service = this.api.hap.Service
 	readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic
+	readonly informationService = new this.api.hap.Service.AccessoryInformation()
 
 	// this is used to track restored cached accessories
-	readonly accessories = new Set<PlatformAccessory>()
+	readonly accessories = new Set<PlatformAccessory<AccessoryContext>>()
+	// prevent collisions of serial numbers
+	readonly serialNumbers = new Set<string>()
 
 	private system!: SecuritySystemAccessory
 	private windOverrideSwitch!: SwitchAccessory
@@ -38,7 +42,14 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		public readonly config: FloodlightPlatformConfig,
 		public readonly api: API
 	) {
-		log.debug(`Finished initializing platform (${VERSION})`)
+		log.debug(`Initialized platform. (${VERSION})`)
+
+		this.informationService
+			.setCharacteristic(
+				this.api.hap.Characteristic.Manufacturer,
+				'Custom Manufacturer'
+			)
+			.setCharacteristic(this.api.hap.Characteristic.Model, 'Custom Model')
 
 		if (this.isConfigInvalid(config)) {
 			return
@@ -56,13 +67,14 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 
 	/**
 	 * This function is invoked when homebridge restores cached accessories from disk at startup.
-	 * It should be used to setup event handlers for characteristics and update respective values.
+	 * It should be used to set up event handlers for characteristics and update respective values.
 	 */
-	configureAccessory(accessory: PlatformAccessory) {
+	configureAccessory(accessory: PlatformAccessory<AccessoryContext>) {
 		this.log.debug('Loading accessory from cache:', accessory.displayName)
 
 		// add the restored accessory to the accessories cache so we can track if it has already been registered
 		this.accessories.add(accessory)
+		this.serialNumbers.add(accessory.context.serialNumber)
 	}
 
 	discoverDevices() {
@@ -105,13 +117,17 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 		config: AccessoryConfig
 	): T {
 		const { log, api } = this
-		const accessories = [...this.accessories]
+		const accessories = Array.from(this.accessories)
 
 		const uuid = api.hap.uuid.generate(`${PLATFORM_NAME}:${config.id}`)
 		const cachedAccessory = accessories.find(({ UUID }) => UUID === uuid)
 
 		if (cachedAccessory) {
-			log.debug('Found accessory in cache:', cachedAccessory.displayName)
+			log.debug(
+				'Found accessory in cache:',
+				cachedAccessory.displayName,
+				`(SN: ${cachedAccessory.context.serialNumber})`
+			)
 			this.accessories.delete(cachedAccessory)
 
 			if (cachedAccessory.context.version === VERSION) {
@@ -124,12 +140,26 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			}
 		}
 
-		log.debug('Registering new accessory:', config.displayName)
 		const accessory = new api.platformAccessory(config.displayName, uuid)
 		accessory.context.device = config
 		accessory.context.version = VERSION
 		accessory.context.state = cachedAccessory?.context.state
+		accessory.context.serialNumber = cachedAccessory?.context.serialNumber
 
+		while (!accessory.context.serialNumber) {
+			const serialNumber = nanoid(13)
+			if (!this.serialNumbers.has(serialNumber)) {
+				accessory.context.serialNumber = serialNumber
+			}
+		}
+
+		log.debug(
+			!!cachedAccessory
+				? 'Re-registering updated accessory:'
+				: 'Registering new accessory:',
+			config.displayName,
+			`(SN: ${accessory.context.serialNumber})`
+		)
 		const accessoryHandler = new ctor(this, accessory)
 		api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory])
 
