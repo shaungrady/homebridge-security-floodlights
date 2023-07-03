@@ -6,6 +6,7 @@ import {
 	PlatformAccessory,
 	Service,
 } from 'homebridge'
+import isEqual from 'lodash.isequal'
 import { nanoid } from 'nanoid'
 
 import { OccupancySensorAccessory } from './accessories/occupancy-sensor.accessory'
@@ -44,14 +45,8 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 	) {
 		log.debug(`Initialized platform. (${VERSION})`)
 
-		this.informationService
-			.setCharacteristic(
-				this.api.hap.Characteristic.Manufacturer,
-				'Custom Manufacturer'
-			)
-			.setCharacteristic(this.api.hap.Characteristic.Model, 'Custom Model')
-
 		if (this.isConfigInvalid(config)) {
+			log.error(`Invalid config; aborting setup.`)
 			return
 		}
 
@@ -128,9 +123,13 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 				cachedAccessory.displayName,
 				`(SN: ${cachedAccessory.context.serialNumber})`
 			)
+
 			this.accessories.delete(cachedAccessory)
 
-			if (cachedAccessory.context.version === VERSION) {
+			if (
+				cachedAccessory.context.version === VERSION &&
+				isEqual(config, cachedAccessory?.context.device)
+			) {
 				return new ctor(this, cachedAccessory)
 			} else {
 				log.debug('Found accessory is outdated; unregistering.')
@@ -273,7 +272,7 @@ export class SecurityFloodlightsPlatform implements DynamicPlatformPlugin {
 			}
 		}
 
-		for (const error in errors) {
+		for (const error of errors) {
 			this.log.error(error)
 		}
 

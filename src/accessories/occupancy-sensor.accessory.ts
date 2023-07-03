@@ -1,4 +1,4 @@
-import { CharacteristicValue, PlatformAccessory } from 'homebridge'
+import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge'
 import { BehaviorSubject, ConnectableObservable, of } from 'rxjs'
 import {
 	delay,
@@ -254,7 +254,7 @@ export class OccupancySensorAccessory {
 	private addMotionSensorSwitches(): void {
 		const { id, displayName, motionSensorCount } = this.device
 		const baseName = `${displayName} Motion`
-		const statesBySwitch = new Map<unknown, CharacteristicValue>()
+		const statesBySwitch = new Map<Service, CharacteristicValue>()
 
 		for (let i = 0; i < motionSensorCount; i++) {
 			const switchName = `${baseName} ${i + 1}`

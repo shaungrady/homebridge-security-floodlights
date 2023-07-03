@@ -3,11 +3,12 @@
   "platforms": [
     {
       "platform": "SecurityFloodlights",
+			"showWindOverrideSwitch": true,
       "lightGroups": [
         {
           "id": "backyard",
           "displayName": "Backyard",
-          "motionSensorCount": 2,
+          "motionSensorCount": 1,
           "occupancyTimeoutSeconds": 6
         }
       ]

@@ -27,10 +27,12 @@
     "preversion": "yarn build"
   },
   "dependencies": {
+    "lodash.isequal": "^4.5.0",
     "nanoid": "^3.3.6",
     "rxjs": "^6.6.6"
   },
   "devDependencies": {
+    "@types/lodash.isequal": "^4.5.6",
     "@types/node": "^14.14.31",
     "eslint": "^7.21.0",
     "eslint-config-airbnb-base": "^14.2.1",
